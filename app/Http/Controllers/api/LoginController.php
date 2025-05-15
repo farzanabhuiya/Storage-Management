@@ -54,12 +54,7 @@ public function __construct()
         'password' => [
             'required',
             'min:8'
-            // 'max:20',
-            // 'confirmed',
-            // 'regex:/[A-Z]/',  
-            // 'regex:/[a-z]/',  
-            // 'regex:/[0-9]/',  
-            // 'regex:/[\W]/'    
+              
         ]
     ];
 
@@ -121,6 +116,76 @@ public function validateData($data)
         ];
     }
 
+
+
+                      // forgot-password
+public function sendResetCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+    ]);
+
+    $code = rand(100000, 999999);
+    $user = User::where('email', $request->email)->first();
+    $user->reset_code = $code;
+    $user->reset_code_expires_at = now()->addMinutes(10);
+    $user->save();
+
+    return response()->json(['message' => 'Verification code sent to your email.']);
+}
+   
+
+
+              //  verif
+public function verifyResetCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|digits:6',
+    ]);
+
+    $user = User::where('email', $request->email)
+                ->where('reset_code', $request->code)
+                ->where('reset_code_expires_at', '>', now())
+                ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'Invalid or expired code.'], 422);
+    }
+
+    return response()->json(['message' => 'Code verified.']);
+}
+
+
+                    //  resetPassword
+public function resetPassword(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|digits:6',
+        'password' => 'required|confirmed|min:6',
+    ]);
+
+    $user = User::where('email', $request->email)
+                ->where('reset_code', $request->code)
+                ->where('reset_code_expires_at', '>', now())
+                ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'Invalid or expired code.'], 422);
+    }
+
+    $user->password = Hash::make($request->password);
+    $user->reset_code = null;
+    $user->reset_code_expires_at = null;
+    $user->save();
+
+    return response()->json(['message' => 'Password has been reset successfully.']);
+}
+
+
+
+
   //  logout
   public function logOut(Request $request)
   {
@@ -132,14 +197,4 @@ public function validateData($data)
     ]);
   }
 
-
-  // getuserinfo
-  // public function getuserinfo(Request $request)
-  // {
-  //   $user = auth()->user();
-  //   return response()->json([
-  //     'status' => true,
-  //     'user' => $user,
-  //   ]);
-  // }
 }

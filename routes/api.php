@@ -17,12 +17,17 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-                  //    LoginController Route
+                   //    LoginController Route
 Route::controller(LoginController::class)->group(function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
     Route::middleware('auth:sanctum')->post('/logout', 'logOut');
+       //  Password reset APIs
+    Route::post('/forgot-password', 'sendResetCode');
+    Route::post('/verify-code', 'verifyResetCode');
+    Route::post('/reset-password', 'resetPassword');
 });
+
 
 
                    //   floder route
@@ -33,7 +38,6 @@ Route::controller(LoginController::class)->group(function () {
  });
 
        
-
 
                 //  note route
 Route::middleware('auth:sanctum')->group(function () {
