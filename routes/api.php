@@ -82,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/favorites', [FavoriteController::class, 'destroy']);
 });
 
-
+            // file route
      Route::middleware('auth:sanctum')->group(function () {
     Route::post('/file/lock', [FileController::class, 'lock']);
     Route::post('/file/unlock', [FileController::class, 'unlock']);
