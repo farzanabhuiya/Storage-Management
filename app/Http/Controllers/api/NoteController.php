@@ -11,20 +11,20 @@ class NoteController extends Controller
 {
 
     // CREATE NOTE
-  public function store(Request $request)
+ public function store(Request $request)
 {
     $request->validate([
         'title' => 'required|string',
         'content' => 'required|string',
     ]);
 
-    $sizeInKB = round(strlen($request->content) / 1024);
-    // dd($sizeInKB);
+    $content = $request->content;
+    $sizeInKB = max(1, ceil(strlen($content) / 1024)); // ✅ অন্তত 1 KB
 
     $note = Note::create([
-        'user_id' =>Auth::id(),
+        'user_id' => Auth::id(),
         'title' => $request->title,
-        'content' => $request->content,
+        'content' => $content,
         'size_in_kb' => $sizeInKB,
     ]);
 
@@ -37,10 +37,12 @@ class NoteController extends Controller
 
 
 
+//    count note
 public function index()
 {
     $totalItems = Note::count();
     $totalSizeKB = Note::sum('size_in_kb');
+
     $totalSizeGB = number_format($totalSizeKB / 1024 / 1024, 8); // KB → MB → GB
 
     return response()->json([

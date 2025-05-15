@@ -16,7 +16,7 @@ return new class extends Migration
                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                $table->string('title');
                $table->text('content');
-               $table->integer('size_in_kb')->nullable(); // size storage ন্য 
+               $table->integer('size_in_kb')->default(1);   
                $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@ class FileController extends Controller
       public function lock(Request $request)
     {
         $request->validate([
-            // 'file_id' => 'required|exists:files,id',
+        'file_id' => 'required|exists:files,id',
             'lock_pin' => 'required|digits:4',
         ]);
 
